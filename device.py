@@ -14,6 +14,8 @@ node_info = {}
 
 def register_to_leader():
 	global leader_ip, node_info
+	if not os.path.isdir("./config"):
+		os.mkdir("./config", 0774)
 	if not os.path.exists("./config/device.config"):
 		leader_ip = input("Leader IP: ")
 		content = {}
@@ -42,7 +44,7 @@ def register_to_leader():
 			else:
 				value = input("{}: ".format(attribute))
 				node_info[attribute] = value
-		try:	
+		try:
 			node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
 			node_info["nodeID"] = node_id.text.zfill(10)
 			content["node_info"] = node_info
@@ -96,7 +98,7 @@ def get_services():
 	services = requests.get("http://{}:8000/service".format(leader_ip)).text
 	services = convert_to_list(services)
 	services = filter_services(services)
-	return services	
+	return services
 
 def request_service(service):
 	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service).text
